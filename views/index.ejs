@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheets/index.css">
+</head>
+<body class="bg-zinc-800">
+    <!-- Navbar -->
+    <div class="w-100 text-white flex p-4 items-center">
+        <span class="m-1 text-yellow-300 text-3xl drop-shadow-[2px_2px_2px_rgba(255,0,0,1)]">UniHub</span>
+        
+        <!-- Search -->
+        <span class="m-1 flex-grow flex items-center rounded">
+            <div class="flex items-center w-full h-full">
+                <input 
+                    type="text" 
+                    placeholder="search..." 
+                    class="text-white bg-zinc-500 p-2 rounded-l outline-none w-full"
+                />
+                <button class="bg-red-500 text-white p-2 rounded-r flex items-center">
+                    Search
+                    <img src="https://www.svgrepo.com/show/79552/magnifying-glass.svg" alt="Search Icon" class="ml-1 mr-2 w-4 h-4"/>
+                </button>
+            </div>
+        </span>
+
+        <!-- Login/Hi {username} and Sell Buttons -->
+        <span class="ml-1 flex items-center">
+            <% if (!name) { %>
+                <!-- Show Login Button if not logged in -->
+                <a href="/login">
+                    <button class="bg-blue-500 text-white p-2 rounded border border-blue-700 mr-2">
+                        Login
+                    </button>
+                </a>
+            <% } else { %>
+                <!-- Show Hi {username} if logged in -->
+                <a href="/profile">
+                    <span class="text-white mr-4 cursor-pointer">Hi, <%= name %></span>
+                </a>
+            <% } %>
+            <a href="/list">
+                <button class="bg-yellow-400 text-white p-2 rounded border border-green-700">
+                    Sell
+                </button>
+            </a>
+        </span>
+    </div>
+</body>
+</html>

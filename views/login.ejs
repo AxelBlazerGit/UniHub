@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheets/index.css">
+    <style>
+        .error-message {
+            color: #f20a3c; /* Tailwind's red-600 color */
+            font-size: 0.875rem; /* Text-sm */
+            display: none;
+            text-align: center;
+            margin-top: 8px;
+        }
+        .bg-image {
+            background-image: url("/images/loginBG.png");
+            background-size: cover;
+            background-position: center;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-effect2 {
+            background: rgba(255, 255, 255, 0);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem;
+            outline: none;
+            color: #000;
+            box-shadow: inset 0 1px 4px rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .error-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="bg-image flex justify-center items-center h-screen">
+    <div class="flex w-1/3 overflow-hidden justify-center">
+        <!-- Login Form -->
+        <div class="p-8 flex flex-col justify-center glass-effect">
+            <h1 class="text-3xl text-center text-yellow-300 mt-.5">Login to UniHub</h1>
+            <br>
+            <div class="form-container">
+                <form id="loginForm" action="/login" method="POST" class="space-y-4">
+                    <div class="relative">
+                        <input 
+                            type="email" 
+                            name="email" 
+                            id="email" 
+                            placeholder="Email" 
+                            required 
+                            class="glass-input p-2 rounded text-white outline-none"
+                        />
+                    </div>
+                    <div class="error-container">
+                        <span id="emailError" class="error-message glass-effect2">Invalid email address</span>
+                    </div>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            name="password" 
+                            id="password" 
+                            placeholder="Password" 
+                            required 
+                            class="glass-input p-2 rounded text-white outline-none"
+                        />
+                        <div class="text-sm text-yellow-200 text-center mt-2">(Minimum password length is 8 characters)</div>
+                    </div>
+                    <button id="submitButton" type="submit" class="w-full p-2 bg-gray-500 text-white rounded cursor-not-allowed" disabled>
+                        Login
+                    </button>
+                </form>
+                <a href="/signup" class="mt-4 text-center text-blue-300 hover:underline">Don't have an account?</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('emailError');
+        const submitButton = document.getElementById('submitButton');
+        const form = document.getElementById('loginForm');
+
+        let isEmailValid = false;
+
+        // Validate email when leaving the field
+        emailInput.addEventListener('blur', () => {
+            const emailValue = emailInput.value;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (emailPattern.test(emailValue)) {
+                emailError.style.display = 'none';
+                isEmailValid = true;
+            } else {
+                emailError.style.display = 'block';
+                isEmailValid = false;
+            }
+            checkFormValidity();
+        });
+
+        // Validate password in real-time
+        passwordInput.addEventListener('input', () => {
+            checkFormValidity();
+        });
+
+        function checkFormValidity() {
+            const passwordValue = passwordInput.value;
+            const isPasswordValid = passwordValue.length >= 8;
+
+            if (isEmailValid && isPasswordValid) {
+                submitButton.classList.remove('cursor-not-allowed', 'bg-gray-500');
+                submitButton.classList.add('cursor-pointer', 'bg-blue-500');
+                submitButton.disabled = false;
+            } else {
+                submitButton.classList.add('cursor-not-allowed', 'bg-gray-500');
+                submitButton.classList.remove('cursor-pointer', 'bg-blue-500');
+                submitButton.disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>
