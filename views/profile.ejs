@@ -39,8 +39,8 @@
                 <% listings.forEach(listing => { %>
                     <a href="/product/<%= listing.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
                         <img src="<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
-                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.title %></h3>
-                        <p class="truncate mb-2"><%= listing.description %></p>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.description %></h3>
+                        <p class="truncate mb-2 truncate"><%= listing.title %></p>
                         <p class="font-semibold text-yellow-400">₹<%= listing.price %></p>
                     </a>
                 <% }) %>
@@ -61,9 +61,9 @@
                 <% orders.forEach(order => { %>
                     <a href="/product/<%= order.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
                         <img src="<%= order.image %>" alt="<%= order.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
-                        <h3 class="font-bold text-lg mb-2 truncate"><%= order.title %></h3>
-                        <p class="truncate mb-2"><%= order.description %></p>
-                        <p class="font-semibold text-yellow-400">₹<%= order.price %></p>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.description %></h3>
+                        <p class="truncate mb-2 truncate"><%= listing.title %></p>
+                        <p class="font-semibold text-yellow-400">₹<%= listing.price %></p>
                     </a>
                 <% }) %>
             </div>
