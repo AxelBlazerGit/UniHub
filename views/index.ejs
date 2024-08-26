@@ -18,7 +18,7 @@
                 <input 
                     type="text" 
                     placeholder="search..." 
-                    class="text-white bg-zinc-500 p-2 rounded-l outline-none w-full"
+                    class="text-white bg-zinc-500 p-2 rounded-l outline-none w-full truncate"
                 />
                 <button class="bg-red-500 text-white p-2 rounded-r flex items-center">
                     Search
@@ -49,5 +49,96 @@
             </a>
         </span>
     </div>
+
+    <!-- the 5 listings sections -->
+    <div class="p-4 text-white">
+
+        <!-- Marquee Section -->
+        <% if (marqueeListings.length) { %>
+            <h2 class="text-2xl mb-4">Featured Listings</h2>
+            <marquee behavior="scroll" direction="left" scrollamount="5">
+                <div class="flex space-x-4">
+                    <% marqueeListings.forEach(listing => { %>
+                        <a href="/product/<%= listing.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md w-60">
+                            <img src="data:image/jpeg;base64,<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+                            <h3 class="font-bold text-lg mb-2 truncate"><%= listing.title %></h3>
+                            <p class="truncate mb-2"><%= listing.description %></p>
+                            <p class="font-semibold text-yellow-400 truncate">₹<%= listing.price %></p>
+                        </a>
+                    <% }) %>
+                </div>
+            </marquee>
+        <% } %>
+
+        <!-- Books Section -->
+        <h2 class="text-2xl mb-4">Books</h2>
+        <div class="grid grid-cols-7 gap-4">
+            <% if (books.length) { %>
+                <% books.forEach(listing => { %>
+                    <a href="/product/<%= listing.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
+                        <img src="data:image/jpeg;base64,<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.title %></h3>
+                        <p class="truncate mb-2"><%= listing.description %></p>
+                        <p class="font-semibold text-yellow-400 truncate">₹<%= listing.price %></p>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <p class="text-gray-400">Stay tuned for new listings will appear here shortly.</p>
+            <% } %>
+        </div>
+    
+        <!-- Notes Section -->
+        <h2 class="text-2xl mb-4">Notes</h2>
+        <div class="grid grid-cols-7 gap-4">
+            <% if (notes.length) { %>
+                <% notes.forEach(listing => { %>
+                    <a href="/product/<%= listing.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
+                        <img src="data:image/jpeg;base64,<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.title %></h3>
+                        <p class="truncate mb-2"><%= listing.description %></p>
+                        <p class="font-semibold text-yellow-400 truncate">₹<%= listing.price %></p>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <p class="text-gray-400">Stay tuned for new listings will appear here shortly.</p>
+            <% } %>
+        </div>
+    
+        <!-- Instruments Section -->
+        <h2 class="text-2xl mb-4">Instruments</h2>
+        <div class="grid grid-cols-7 gap-4">
+            <% if (instruments.length) { %>
+                <% instruments.forEach(listing => { %>
+                    <a href="/product/<%= listing.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
+                        <img src="data:image/jpeg;base64,<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.title %></h3>
+                        <p class="truncate mb-2"><%= listing.description %></p>
+                        <p class="font-semibold text-yellow-400 truncate">₹<%= listing.price %></p>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <p class="text-gray-400">Stay tuned for new listings will appear here shortly.</p>
+            <% } %>
+        </div>
+    
+        <!-- Other Utilities Section -->
+        <h2 class="text-2xl mb-4">Other Utilities</h2>
+        <div class="grid grid-cols-7 gap-4">
+            <% if (utilities.length) { %>
+                <% utilities.forEach(listing => { %>
+                    <a href="/product/<%= listing.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
+                        <img src="data:image/jpeg;base64,<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.title %></h3>
+                        <p class="truncate mb-2"><%= listing.description %></p>
+                        <p class="font-semibold text-yellow-400 truncate">₹<%= listing.price %></p>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <p class="text-gray-400">Stay tuned for new listings will appear here shortly.</p>
+            <% } %>
+        </div>
+    
+    </div>
+    
 </body>
 </html>

@@ -29,7 +29,39 @@ const upload = multer({ storage: storage });
 app.get("/", function (req, res) {
     const email = session.email;
     const name = email ? email.split('@')[0] : null;
-    res.render("index", { name });
+    let listings = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
+
+    // Filter out listings based on login status
+    if (email) {
+        listings = Object.entries(listings)
+            .filter(([sellerEmail, sellerListings]) => sellerEmail !== email)
+            .reduce((acc, [sellerEmail, sellerListings]) => {
+                const filteredListings = sellerListings.filter(listing => listing.buyerEmail !== email);
+                if (filteredListings.length) {
+                    acc[sellerEmail] = filteredListings;
+                }
+                return acc;
+            }, {});
+    }
+
+    // Flatten listings and shuffle for the marquee
+    let allListings = Object.values(listings).flat();
+    const marqueeListings = allListings.splice(0, 25);
+
+    // Categorize remaining listings
+    const books = allListings.filter(listing => listing.category === 'books');
+    const notes = allListings.filter(listing => listing.category === 'notes');
+    const instruments = allListings.filter(listing => listing.category === 'instruments');
+    const utilities = allListings.filter(listing => listing.category === 'other utilities');
+
+    res.render("index", {
+        name,
+        marqueeListings,
+        books,
+        notes,
+        instruments,
+        utilities,
+    });
 });
 
 // Route to render login.ejs
@@ -156,6 +188,8 @@ app.post("/list", checkLoggedIn, upload.single('productImage'), function (req, r
 
     res.redirect('/profile');
 });
+
+
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");

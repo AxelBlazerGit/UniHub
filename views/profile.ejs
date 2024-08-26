@@ -34,16 +34,20 @@
     <!-- My Listings Section -->
     <div class="p-4 text-white">
         <h2 class="text-2xl mb-4">My Listings</h2>
-        <div class="grid grid-cols-2 gap-4">
-            <% listings.forEach((listing, index) => { %>
-                <div class="bg-zinc-700 p-4 rounded-lg shadow-md">
-                    <img src="<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
-                    <h3 class="font-bold text-lg mb-2"><%= listing.title %></h3>
-                    <p class="truncate mb-2"><%= listing.description %></p>
-                    <p class="font-semibold text-yellow-400">$<%= listing.price %></p>
-                </div>
-            <% }); %>
-        </div>
+        <% if (listings.length) { %>
+            <div class="grid grid-cols-7 gap-4">
+                <% listings.forEach(listing => { %>
+                    <a href="/product/<%= listing.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
+                        <img src="<%= listing.image %>" alt="<%= listing.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= listing.title %></h3>
+                        <p class="truncate mb-2"><%= listing.description %></p>
+                        <p class="font-semibold text-yellow-400">₹<%= listing.price %></p>
+                    </a>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p class="text-gray-400">No listings yet... <a href="/list" class="text-yellow-300 underline">Add one?</a></p>
+        <% } %>
     </div>
 
     <!-- Gap -->
@@ -52,16 +56,20 @@
     <!-- My Orders Section -->
     <div class="p-4 text-white">
         <h2 class="text-2xl mb-4">My Orders</h2>
-        <div class="grid grid-cols-2 gap-4">
-            <% orders.forEach((order, index) => { %>
-                <div class="bg-zinc-700 p-4 rounded-lg shadow-md">
-                    <img src="<%= order.image %>" alt="<%= order.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
-                    <h3 class="font-bold text-lg mb-2"><%= order.title %></h3>
-                    <p class="truncate mb-2"><%= order.description %></p>
-                    <p class="font-semibold text-yellow-400">$<%= order.price %></p>
-                </div>
-            <% }); %>
-        </div>
+        <% if (orders.length) { %>
+            <div class="grid grid-cols-7 gap-4">
+                <% orders.forEach(order => { %>
+                    <a href="/product/<%= order.id %>" class="bg-zinc-700 p-4 rounded-lg shadow-md">
+                        <img src="<%= order.image %>" alt="<%= order.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+                        <h3 class="font-bold text-lg mb-2 truncate"><%= order.title %></h3>
+                        <p class="truncate mb-2"><%= order.description %></p>
+                        <p class="font-semibold text-yellow-400">₹<%= order.price %></p>
+                    </a>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p class="text-gray-400">No orders yet... <a href="/" class="text-yellow-300 underline">Browse to buy?</a></p>
+        <% } %>
     </div>
 </body>
 </html>
