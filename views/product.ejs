@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-800">
+    <!-- Navbar -->
+    <div class="w-100 text-white flex p-4 items-center">
+        <!-- Sign Out -->
+        <span class="m-1 text-red-500 cursor-pointer" onclick="document.getElementById('signoutForm').submit();">
+            Sign Out
+        </span>
+        
+        <!-- UniHub Logo -->
+        <a href="/" class="m-1 flex-grow text-center text-yellow-300 text-3xl drop-shadow-[2px_2px_2px_rgba(255,0,0,1)]">
+            UniHub
+        </a>
+
+        <!-- Username -->
+        <span class="pr-2 text-white text-xl drop-shadow-[2px_2px_2px_rgba(255,255,255,0.5)] cursor-pointer">
+            Hi, 
+            <span class="text-yellow-300 drop-shadow-[1px_1px_1px_rgba(255,255,0,1)]">
+                <%= name %>
+            </span>
+        </span>
+    </div>
+
+    <!-- Sign Out Form (hidden) -->
+    <form id="signoutForm" action="/signout" method="POST" class="hidden"></form>
+
+    <!-- Gap -->
+    <div class="h-12"></div>
+
+    <!-- Product Details Section -->
+    <div class="p-4 text-white">
+        <h2 class="text-2xl mb-4">Product Details</h2>
+        <div class="bg-zinc-700 p-4 rounded-lg shadow-md">
+            <img src="data:image/jpeg;base64,<%= product.image %>" alt="<%= product.title %>" class="w-full h-40 object-cover mb-2 rounded-lg"/>
+            <h3 class="font-bold text-lg mb-2"><%= product.description %></h3>
+            <p class="mb-2"><%= product.title %></p>
+            <p class="font-semibold text-yellow-400">₹<%= product.price %></p>
+            <!-- Purchase Button -->
+            <% if (name) { %>
+                <form action="/complete-purchase" method="POST" class="mb-4">
+                    <input type="hidden" name="productId" value="<%= product.id %>"/>
+                    <button type="submit" class="bg-yellow-500 p-2 rounded-lg text-black">Complete Purchase</button>
+                </form>
+            <% } else { %>
+                <p class="text-gray-400">Please <a href="/login" class="text-yellow-300 underline">log in</a> to purchase.</p>
+            <% } %>
+            <!-- Edit Button (if logged in and user is the seller) -->
+            <% if (name && product.sellerEmail === name.split('@')[0]) { %>
+                <a href="/edit/<%= product.id %>" class="bg-yellow-500 p-2 rounded-lg text-black">Edit</a>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
