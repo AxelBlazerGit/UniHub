@@ -6,7 +6,7 @@ const session = require('express-session');
 require('dotenv').config();
 const app = express();
 
-
+// Set up EJS as the view engine
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -137,12 +137,13 @@ app.get("/profile", checkLoggedIn, function (req, res) {
     let orders = [];
 
     try {
-        const data = JSON.parse(fs.readFileSync('listings.json'));
+        const data = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
 
         if (data[email]) {
             listings = data[email].map(listing => ({
                 ...listing,
-                image: `data:image/jpeg;base64,${listing.image}` 
+                image: `data:image/jpeg;base64,${listing.image}`,
+                sellerEmail: email // Include the seller's email
             }));
         }
 
@@ -150,16 +151,18 @@ app.get("/profile", checkLoggedIn, function (req, res) {
             const userOrders = data[sellerEmail].filter(listing => listing.buyerEmail === email);
             orders.push(...userOrders.map(order => ({
                 ...order,
-                image: `data:image/jpeg;base64,${order.image}` 
+                image: `data:image/jpeg;base64,${order.image}`,
+                sellerEmail // Include the seller's email
             })));
         }
 
-        res.render("profile", { name, listings, orders });
+        res.render("profile", { email, name, listings, orders });
     } catch (err) {
         console.error("Error reading listings.json:", err);
-        res.render("profile", { name, listings, orders });
+        res.render("profile", { email, name, listings, orders });
     }
 });
+
 
 // Route to sign out
 app.post("/signout", function (req, res) {
@@ -204,6 +207,121 @@ app.post("/list", checkLoggedIn, upload.single('productImage'), function (req, r
     res.redirect('/profile');
 });
 
+// Route to render product.ejs (Handles the /product/:id route)
+app.get("/product/:id", (req, res) => {
+    const { id } = req.params;
+    const listings = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
+    
+    let product = null;
+    for (let sellerEmail in listings) {
+        const foundProduct = listings[sellerEmail].find(listing => listing.id === id);
+        if (foundProduct) {
+            product = foundProduct;
+            break;
+        }
+    }
+
+    if (product) {
+        console.log(product); // Log product details
+        res.render("product", { product, name: req.session.email ? req.session.email.split('@')[0] : null });
+    } else {
+        res.status(404).send("Product not found");
+    }
+});
+
+// Route to handle purchasing a product
+app.get("/buy/:id", checkLoggedIn, (req, res) => {
+    const { id } = req.params;
+    const listings = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
+
+    let product = null;
+    for (let sellerEmail in listings) {
+        const foundProduct = listings[sellerEmail].find(listing => listing.id === id);
+        if (foundProduct) {
+            product = foundProduct;
+            break;
+        }
+    }
+
+    if (product) {
+        res.render("buy", { product, name: req.session.email ? req.session.email.split('@')[0] : null });
+    } else {
+        res.status(404).send("Product not found");
+    }
+});
+
+// Route to complete a purchase
+app.post("/complete-purchase", checkLoggedIn, (req, res) => {
+    const { productId } = req.body;
+    const listings = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
+    const email = req.session.email;
+
+    for (let sellerEmail in listings) {
+        const productIndex = listings[sellerEmail].findIndex(listing => listing.id === productId);
+        if (productIndex !== -1) {
+            listings[sellerEmail][productIndex].buyerEmail = email;
+            fs.writeFileSync('listings.json', JSON.stringify(listings, null, 2));
+            return res.redirect("/profile");
+        }
+    }
+
+    res.status(404).send("Product not found or already sold");
+});
+
+// Route to display edit form
+app.get('/edit/:id', checkLoggedIn, (req, res) => {
+    const productId = req.params.id;
+    const listings = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
+    const email = req.session.email;
+
+    let product = null;
+
+    // Find the product by id within the user's listings
+    if (listings[email]) {
+        product = listings[email].find(listing => listing.id === productId);
+    }
+
+    if (product) {
+        res.render('edit', { product, email });
+    } else {
+        res.redirect('/profile');
+    }
+});
+
+// Route to handle form submission
+app.post('/edit/:id', upload.single('productImage'), (req, res) => {
+    const productId = req.params.id;
+    const { productName, productTitle, productPrice, productCategory } = req.body;
+    const email = req.session.email;
+    let listings = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
+
+    if (listings[email]) {
+        let listingIndex = listings[email].findIndex(listing => listing.id === productId);
+
+        if (listingIndex !== -1) {
+            const listing = listings[email][listingIndex];
+
+            // Update mutable fields
+            listing.name = productName;
+            listing.title = productTitle;
+            listing.price = productPrice;
+
+            // Retain the existing image if no new image is uploaded
+            if (req.file) {
+                listing.image = req.file.buffer.toString('base64');
+            }
+
+            // Save updated listings back to the file
+            fs.writeFileSync('listings.json', JSON.stringify(listings, null, 2));
+
+            return res.redirect('/profile');
+        }
+    }
+
+    res.status(404).send("Product not found or you're not authorized to edit this listing");
+});
+
+// Start the server
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
 });
