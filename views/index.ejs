@@ -6,6 +6,29 @@
     <title>UniHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/stylesheets/index.css">
+    <style>
+        .dropdown {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          gap: 20px;
+        }
+      
+        .dropdown select option {
+          color: #ffff00; /* Yellow text color */
+          text-shadow: 0 0 2px rgba(255, 0, 0, 1); /* Bright red shadow with 2px blur */
+          background-color: #1c1c1c; /* Background to ensure contrast with text */
+        }
+      
+        /* Dropdown select styling */
+        .dropdown select {
+          background-color: #1c1c1c; /* Background color of the dropdown box */
+          color: #ffff00; /* Dropdown text color matching the option text */
+        }
+      </style>
+      
+      
     <script>
         function filterListings(category) {
             document.querySelectorAll('.listing-card').forEach(card => {
@@ -51,7 +74,12 @@
             <% } else { %>
                 <!-- Show Hi {username} if logged in -->
                 <a href="/profile">
-                    <span class="text-white mr-4 cursor-pointer">Hi, <%= name %></span>
+                    <span class="pr-2 text-white text-xl drop-shadow-[2px_2px_2px_rgba(255,255,255,0.5)] cursor-pointer">
+                        Hi, 
+                        <span class="text-yellow-300 drop-shadow-[1px_1px_1px_rgba(255,255,0,1)]">
+                            <%= name %>
+                        </span>
+                    </span>
                 </a>
             <% } %>
             <a href="/list">
@@ -63,16 +91,16 @@
     </div>
 
     <!-- Dropdown Menu -->
-    <div class="p-4">
+    <div class="dropdown p-4">
         <label for="category" class="text-xl">Select Category:</label>
-        <select id="category" class="bg-zinc-600 text-white p-2 rounded" onchange="filterListings(this.value)">
-            <option value="Featured" selected>Featured</option>
-            <option value="books">Books</option>
-            <option value="instruments">Instruments</option>
-            <option value="notes">Notes</option>
-            <option value="utilities">Utilities</option>
+        <select id="category" class="bg-zinc-800 text-yellow-200 p-2 rounded" onchange="filterListings(this.value)">
+          <option value="Featured" selected>Featured</option>
+          <option value="books">Books</option>
+          <option value="instruments">Instruments</option>
+          <option value="notes">Notes</option>
+          <option value="utilities">Utilities</option>
         </select>
-    </div>
+      </div>
 
     <!-- Listings -->
     <div class="p-4 grid grid-cols-7 gap-4">
