@@ -2,20 +2,27 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const session = require('express-session');
+require('dotenv').config();
 const app = express();
 
-// Simulated session storage (in-memory for this example)
-let session = {};
 
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Configure session middleware
+app.use(session({
+    secret: process.env.SESSION_SECRET, // Replace with a more secure key in production
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // Cookie expires in 24 hours
+}));
+
 // Middleware to check if the user is logged in
 function checkLoggedIn(req, res, next) {
-    const email = session.email;
-    if (!email) {
+    if (!req.session.email) {
         return res.redirect('/login');
     }
     next();
@@ -27,11 +34,16 @@ const upload = multer({ storage: storage });
 
 // Route to render index.ejs
 app.get("/", function (req, res) {
-    const email = session.email;
-    const name = email ? email.split('@')[0] : null;
+    const email = req.session.email;
+    let name = null;
+
+    if (email) {
+        const users = JSON.parse(fs.readFileSync('users.json', 'utf8'));
+        name = users[email]?.name || email.split('@')[0];
+    }
+
     let listings = JSON.parse(fs.readFileSync('listings.json', 'utf8'));
 
-    // Filter out listings based on login status
     if (email) {
         listings = Object.entries(listings)
             .filter(([sellerEmail, sellerListings]) => sellerEmail !== email)
@@ -44,11 +56,9 @@ app.get("/", function (req, res) {
             }, {});
     }
 
-    // Flatten listings and shuffle for the marquee
     let allListings = Object.values(listings).flat();
     const marqueeListings = allListings.splice(0, 25);
 
-    // Categorize remaining listings
     const books = allListings.filter(listing => listing.category === 'books');
     const notes = allListings.filter(listing => listing.category === 'notes');
     const instruments = allListings.filter(listing => listing.category === 'instruments');
@@ -75,7 +85,7 @@ app.post("/login", function (req, res) {
     let users = JSON.parse(fs.readFileSync('users.json'));
 
     if (users[email] && users[email].password === password) {
-        session.email = email;
+        req.session.email = email;
         return res.redirect('/profile');
     } else {
         return res.render('login', { error: "Invalid email or password" });
@@ -108,7 +118,7 @@ app.post("/signup", function (req, res) {
 
         users[email] = { name, city, institution, password };
         fs.writeFileSync('users.json', JSON.stringify(users, null, 2));
-        session.email = email;
+        req.session.email = email;
 
         res.redirect('/profile');
     } catch (err) {
@@ -119,8 +129,9 @@ app.post("/signup", function (req, res) {
 
 // Route to render profile.ejs (Requires login)
 app.get("/profile", checkLoggedIn, function (req, res) {
-    const email = session.email;
-    const name = email.split('@')[0];
+    const email = req.session.email;
+    const users = JSON.parse(fs.readFileSync('users.json', 'utf8'));
+    const name = users[email]?.name || email.split('@')[0];
 
     let listings = [];
     let orders = [];
@@ -131,7 +142,7 @@ app.get("/profile", checkLoggedIn, function (req, res) {
         if (data[email]) {
             listings = data[email].map(listing => ({
                 ...listing,
-                image: `data:image/jpeg;base64,${listing.image}` // Convert base64 to image URL
+                image: `data:image/jpeg;base64,${listing.image}` 
             }));
         }
 
@@ -139,7 +150,7 @@ app.get("/profile", checkLoggedIn, function (req, res) {
             const userOrders = data[sellerEmail].filter(listing => listing.buyerEmail === email);
             orders.push(...userOrders.map(order => ({
                 ...order,
-                image: `data:image/jpeg;base64,${order.image}` // Convert base64 to image URL
+                image: `data:image/jpeg;base64,${order.image}` 
             })));
         }
 
@@ -152,13 +163,17 @@ app.get("/profile", checkLoggedIn, function (req, res) {
 
 // Route to sign out
 app.post("/signout", function (req, res) {
-    session = {}; // Clear the session
-    res.redirect('/');
+    req.session.destroy(err => {
+        if (err) {
+            console.error("Error during signout:", err);
+        }
+        res.redirect('/');
+    });
 });
 
 // Route to render list.ejs (Requires login)
 app.get("/list", checkLoggedIn, function (req, res) {
-    const email = session.email;
+    const email = req.session.email;
     res.render("list", { email });
 });
 
@@ -179,17 +194,15 @@ app.post("/list", checkLoggedIn, upload.single('productImage'), function (req, r
         buyerEmail: buyerEmail || null
     };
 
-    if (!listings[session.email]) {
-        listings[session.email] = [];
+    if (!listings[req.session.email]) {
+        listings[req.session.email] = [];
     }
-    listings[session.email].push(listing);
+    listings[req.session.email].push(listing);
 
     fs.writeFileSync('listings.json', JSON.stringify(listings, null, 2));
 
     res.redirect('/profile');
 });
-
-
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
