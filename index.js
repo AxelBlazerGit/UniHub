@@ -1,10 +1,10 @@
 const express = require('express');
+const app = express();
+const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-const session = require('express-session');
 require('dotenv').config();
-const app = express();
 
 // Set up EJS as the view engine
 app.set("views", path.join(__dirname, "views"));
